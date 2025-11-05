@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodHub - Pesan Makanan Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .cart-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .cart-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .cart-count {
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .categories {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .category-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .menu-item-content {
+            padding: 1.5rem;
+        }
+
+        .menu-item h3 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .menu-item p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .price {
+            color: #667eea;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background: #5568d3;
+        }
+
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+        }
+
+        .cart-content {
+            background: white;
+            max-width: 600px;
+            margin: 2rem auto;
+            border-radius: 15px;
+            padding: 2rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .qty-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid #667eea;
+            text-align: right;
+        }
+
+        .cart-total h3 {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        .checkout-btn:hover {
+            background: #5568d3;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🍔 foodputri</div>
+            <button class="cart-btn" onclick="toggleCart()">
+                🛒 Keranjang <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>Pesan Makanan Favoritmu</h1>
+        <p>Delivery cepat & makanan berkualitas langsung ke rumahmu</p>
+    </div>
+
+    <div class="container">
+        <div class="categories">
+            <button class="category-btn active" onclick="filterMenu('all')">Semua</button>
+            <button class="category-btn" onclick="filterMenu('makanan-berat')">Makanan Berat</button>
+            <button class="category-btn" onclick="filterMenu('snack')">Snack</button>
+            <button class="category-btn" onclick="filterMenu('minuman')">Minuman</button>
+            <button class="category-btn" onclick="filterMenu('dessert')">Dessert</button>
+        </div>
+
+        <div class="menu-grid" id="menuGrid"></div>
+    </div>
+
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Keranjang Belanja</h2>
+                <button class="close-btn" onclick="toggleCart()">&times;</button>
+            </div>
+            <div id="cartItems"></div>
+            <div class="cart-total">
+                <h3>Total: Rp <span id="totalPrice">0</span></h3>
+                <button class="checkout-btn" onclick="checkout()">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 FoodHub. Semua hak dilindungi.</p>
+        <p>Layanan pesan antar makanan terpercaya</p>
+    </footer>
+
+    <script>
+        const menuItems = [
+            {
+                id: 1,
+                name: 'Nasi Goreng Special',
+                category: 'makanan-berat',
+                price: 20000,
+                image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop',
+                description: 'Nasi goreng dengan telur, ayam, dan sayuran segar'
+            },
+            {
+                id: 2,
+                name: 'Mie Ayam Bakso',
+                category: 'makanan-berat',
+                price: 20000,
+                image: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&h=300&fit=crop',
+                description: 'Mie ayam dengan bakso dan pangsit goreng'
+            },
+            {
+                id: 3,
+                name: 'Ayam Geprek',
+                category: 'makanan-berat',
+                price: 22000,
+                image: 'https://images.unsplash.com/photo-1606850780554-b55ef9dd9c85?w=400&h=300&fit=crop',
+                description: 'Ayam crispy dengan sambal geprek level 1-5'
+            },
+            {
+                id: 4,
+                name: 'Burger Beef',
+                category: 'makanan-berat',
+                price: 30000,
+                image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
+                description: 'Burger daging sapi dengan keju dan sayuran'
+            },
+            {
+                id: 5,
+                name: 'Pizza Pepperoni',
+                category: 'makanan-berat',
+                price: 45000,
+                image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&h=300&fit=crop',
+                description: 'Pizza dengan topping pepperoni dan keju mozzarella'
+            },
+            {
+                id: 6,
+                name: 'Kentang Goreng',
+                category: 'snack',
+                price: 15000,
+                image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=300&fit=crop',
+                description: 'Kentang goreng crispy dengan saus'
+            },
+            {
+                id: 7,
+                name: 'Chicken Wings',
+                category: 'snack',
+                price: 28000,
+                image: 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=400&h=300&fit=crop',
+                description: '6 pcs sayap ayam goreng dengan saus pilihan'
+            },
+            {
+                id: 8,
+                name: 'Pisang Goreng',
+                category: 'snack',
+                price: 12000,
+                image: 'https://images.unsplash.com/photo-1587132420000-831f52c48e48?w=400&h=300&fit=crop',
+                description: 'Pisang goreng crispy dengan topping cokelat'
+            },
+            {
+                id: 9,
+                name: 'Es Teh Manis',
+                category: 'minuman',
+                price: 5000,
+                image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
+                description: 'Es teh manis segar'
+            },
+            {
+                id: 10,
+                name: 'Jus Alpukat',
+                category: 'minuman',
+                price: 15000,
+                image: 'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=400&h=300&fit=crop',
+                description: 'Jus alpukat segar dengan susu'
+            },
+            {
+                id: 11,
+                name: 'Es Cappuccino',
+                category: 'minuman',
+                price: 18000,
+                image: 'https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400&h=300&fit=crop',
+                description: 'Kopi cappuccino dingin dengan foam lembut'
+            },
+            {
+                id: 12,
+                name: 'Es Krim Cokelat',
+                category: 'dessert',
+                price: 14000,
+                image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=300&fit=crop',
+                description: '3 scoop es krim cokelat premium'
+            },
+            {
+                id: 13,
+                name: 'Pancake',
+                category: 'dessert',
+                price: 25000,
+                image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop',
+                description: 'Pancake dengan topping madu dan buah'
+            },
+            {
+                id: 14,
+                name: 'Brownies',
+                category: 'dessert',
+                price: 20000,
+                image: 'https://images.unsplash.com/photo-1607920591413-4ec007e70023?w=400&h=300&fit=crop',
+                description: 'Brownies cokelat lembut dengan ice cream'
+            }
+        ];
+
+        let cart = [];
+        let currentFilter = 'all';
+
+        function displayMenu(filter = 'all') {
+            const menuGrid = document.getElementById('menuGrid');
+            const filteredItems = filter === 'all' 
+                ? menuItems 
+                : menuItems.filter(item => item.category === filter);
+
+            menuGrid.innerHTML = filteredItems.map(item => `
+                <div class="menu-item">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="menu-item-content">
+                        <h3>${item.name}</h3>
+                        <p>${item.description}</p>
+                        <div class="price">Rp ${item.price.toLocaleString('id-ID')}</div>
+                        <button class="add-to-cart" onclick="addToCart(${item.id})">
+                            Tambah ke Keranjang
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterMenu(category) {
+            currentFilter = category;
+            displayMenu(category);
+            
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function addToCart(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            const cartItem = cart.find(i => i.id === itemId);
+
+            if (cartItem) {
+                cartItem.quantity++;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+
+            updateCart();
+            alert(`${item.name} ditambahkan ke keranjang!`);
+        }
+
+        function updateCart() {
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const totalPrice = document.getElementById('totalPrice');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="empty-cart">Keranjang belanja kosong</div>';
+                totalPrice.textContent = '0';
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <p>Rp ${item.price.toLocaleString('id-ID')}</p>
+                    </div>
+                    <div class="cart-item-actions">
+                        <button class="qty-btn" onclick="decreaseQty(${item.id})">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="qty-btn" onclick="increaseQty(${item.id})">+</button>
+                        <button class="remove-btn" onclick="removeFromCart(${item.id})">Hapus</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalPrice.textContent = total.toLocaleString('id-ID');
+        }
+
+        function increaseQty(itemId) {
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                item.quantity++;
+                updateCart();
+            }
+        }
+
+        function decreaseQty(itemId) {
+            const item = cart.find(i => i.id === itemId);
+            if (item && item.quantity > 1) {
+                item.quantity--;
+                updateCart();
+            }
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCart();
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Keranjang belanja kosong!');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const items = cart.map(item => `${item.name} (${item.quantity}x)`).join(', ');
+            
+            alert(`Pesanan berhasil!\n\nItem: ${items}\nTotal: Rp ${total.toLocaleString('id-ID')}\n\nTerima kasih telah memesan!`);
+            
+            cart = [];
+            updateCart();
+            toggleCart();
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('cartModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        displayMenu();
+    </script>
+</body>
+</html>
